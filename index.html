@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Translator App</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1>Translator App</h1>
+    <form id="translate-form">
+      <div class="input-group">
+        <input type="text" id="text-to-translate" placeholder="Text to translate">
+        <button id="detect-language" type="button">Detect Language</button>
+      </div>
+      <div id="detected-language"></div>
+      <div class="select-group">
+        <div>
+          <label for="source-language">From</label>
+          <select id="source-language">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="pt">Portuguese</option>
+          </select>
+        </div>
+        <div>
+          <label for="target-language">To</label>
+          <select id="target-language">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="pt">Portuguese</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit">Translate</button>
+    </form>
+    <div id="translation-result"></div>
+  </div>
+
+  <script>
+    document.getElementById('translate-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const text = document.getElementById('text-to-translate').value;
+      const sourceLang = document.getElementById('source-language').value;
+      const targetLang = document.getElementById('target-language').value;
+      const result = await window.electronAPI.translateText({ text, sourceLang, targetLang });
+
+      if (result.error) {
+        document.getElementById('translation-result').innerHTML = `<p>Error: ${result.error}</p>`;
+      } else {
+        document.getElementById('translation-result').innerHTML = `<p>Translation: ${result.translatedText}</p>`;
+      }
+    });
+
+    document.getElementById('detect-language').addEventListener('click', async () => {
+      const text = document.getElementById('text-to-translate').value;
+      const result = await window.electronAPI.detectLanguage({ text });
+
+      if (result.error) {
+        document.getElementById('detected-language').innerHTML = `<p>Error: ${result.error}</p>`;
+      } else {
+        const detectedLang = result[0].language; // Ensure this path is correct
+        document.getElementById('detected-language').innerHTML = `<p>Detected Language: ${detectedLang}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
